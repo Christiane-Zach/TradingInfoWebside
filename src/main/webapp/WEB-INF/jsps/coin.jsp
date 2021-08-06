@@ -19,17 +19,12 @@
 	}
 	.line {
   	fill: none;
-  	stroke: white;      // starts invisible, made visible with transition
-  	stroke-width: 1px;  // half is inside the margin, half is outside
-	}
-	rect {
-  	fill: none;
-  	stroke: black;
+  	stroke: #ffffff;      // starts invisible, made visible with transition
   	stroke-width: 1px;  // half is inside the margin, half is outside
 	}
 	.axis path, .axis line {
   	fill: none;
-  	stroke: #000;
+  	stroke: #ffffff;
   	shape-rendering: crispEdges;
 	}
 </style>
@@ -60,112 +55,164 @@
 		</div>
 		<div class="float-right">
 			<p>${oldInterval} Chart</p>
+			<br></br>
+			<p>Binance</p>
 		</div>
 		<div class="float-right">
-			<p>${candles}</p>
 			<script>
+			function xyDiagramm(data) {
+				var outerWidth = 960, outerHeight = 500;
+				var margin = {top: 100, right: 20, bottom: 80, left: 120};
+				var width = outerWidth - margin.left - margin.right, 
+		    		height = outerHeight - margin.top - margin.bottom;  
+
+				function xValue(d) { return d.x; }
+				function yValue(d) { return d.y; }
 			
-			var outerWidth = 960, outerHeight = 500;
+				var x = d3.scale.linear()                // interpolator for X axis -- inner plot region
+		    		.domain(d3.extent(data,xValue))
+		    		.range([0,width]);
+
+				var y = d3.scale.linear()                // interpolator for Y axis -- inner plot region
+		    		.domain(d3.extent(data,yValue))
+		    		.range([height,0]);                  // remember, (0,0) is upper left -- this reverses "y"
+
+				var line = d3.svg.line()                 // SVG line generator
+		    		.x(function(d) { return x(d.x); } )
+		    		.y(function(d) { return y(d.y); } );
+
+				var xAxis = d3.svg.axis()                // x Axis
+		    		.scale(x)
+		    		.ticks(10)                          
+		    		.orient("bottom");
+
+				var yAxis = d3.svg.axis()                // y Axis
+		    		.scale(y)
+		    		.ticks(10)
+		    		.orient("left");
+
+				var svg = d3.select("body").append("svg")
+		    		.attr("width",  outerWidth)
+		    		.attr("height", outerHeight);        // Note: ok to leave this without units, implied "px"
+
+				var g = svg.append("g")                  // <g> element is the inner plot area (i.e., inside the margins)
+		    		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+				g.append("g")                            // render the Y axis in the inner plot area
+					.style("stroke", "white")
+					.attr("class", "y axis")
+		    		.call(yAxis);
+
+				g.append("g")                            // render the X axis in the inner plot area
+					.style("stroke", "white")
+					.attr("class", "x axis")
+		    		.attr("transform", "translate(0," + height + ")")  // axis runs along lower part of graph
+		    		.call(xAxis);
+
+				g.append("text")                         // outer x-axis label
+					.style("stroke", "white")
+					.attr("class", "x label") 
+		    		.attr("text-anchor", "end") 
+		    		.attr("x", width/2) 
+		    		.attr("y", height + 2*margin.bottom/3 + 6) 
+		    		.text("time");
+
+				g.append("text")                         // outer y-axis label
+					.style("stroke", "white")
+					.attr("class", "x label") 
+		    		.attr("text-anchor", "middle") 
+		    		.attr("x", -height/2)
+		    		.attr("y", -6 - margin.left/3)
+		    		.attr("dy", "-.75em") 
+		    		.attr("transform", "rotate(-90)") 
+		    		.text("${oldPairName}");
+
+				g.append("path")                         // plot the data as a line
+		    		.datum(data)
+		    		.attr("class", "line")
+		    		.attr("d", line);
+
+				g.selectAll(".dot")                      // plot a circle at each data location
+		    		.data(data)
+		  			.enter().append("circle")
+		    		.style("stroke", "white")
+		  			.attr("class", "dot")
+		    		.attr("cx", function(d) { return x(d.x); } )
+		    		.attr("cy", function(d) { return y(d.y); } )
+		    		.attr("r", 1);
+			}
 			
-			var margin = {top: 100, right: 20, bottom: 80, left: 80};
+			var data = [
+				<c:forEach items="${candles}" var="candle" varStatus="status">  
+				    {x: '${candle.epochTime}',
+				    y: '${candle.openPrice}'}
+				    <c:if test="${!status.last}">,    
+				    </c:if>  
+				    </c:forEach>  
+				];
 			
-			var width = outerWidth - margin.left - margin.right, 
-		    	height = outerHeight - margin.top - margin.bottom;  
+			xyDiagramm(data);
+			</script>
+		</div>
+	</div>
+	<div class="container">
+		<div class="float-left">
+			<br></br>
+			<br></br>
+		</div>
+		<div class="float-right">
+			<br></br>
+			<p>Bitfinex</p>
+		</div>
+	</div>
+	<div class="container">
+		<div class="float-left">
+			<br></br>
+			<br></br>
+		</div>
+		<div class="float-right">
+			<script>
+			var data = [
+				<c:forEach items="${candles}" var="candle" varStatus="status">  
+				    {x: '${candle.epochTime}',
+				    y: '${candle.openPrice}'}
+				    <c:if test="${!status.last}">,    
+				    </c:if>  
+				    </c:forEach>  
+				];
 			
-			document.body.style.margin="0px"; 
+			xyDiagramm(data);
+			</script>
+		</div>
+	</div>
+	<div class="container">
+		<div class="float-left">
+			<br></br>
+			<br></br>
+		</div>
+		<div class="float-right">
+			<br></br>
+			<p>Difference</p>
+		</div>
+	</div>
+	<div class="container">
+		<div class="float-left">
+			<br></br>
+			<br></br>
+		</div>
+		<div class="float-right">
+			<script>
+			var data = [
+				<c:forEach items="${candles}" var="candle" varStatus="status">  
+				    {x: '${candle.epochTime}',
+				    y: '${candle.openPrice}'}
+				    <c:if test="${!status.last}">,    
+				    </c:if>  
+				    </c:forEach>  
+				];
 			
-			var data = [ {x: 0, y: 00}, {x: 1, y: 30}, {x: 2, y: 40},
-	             {x: 3, y: 20}, {x: 4, y: 90}, {x: 5, y: 70} ];
-
-			function xValue(d) { return d.x; }
-			function yValue(d) { return d.y; }
-			
-			var x = d3.scale.linear()                // interpolator for X axis -- inner plot region
-		    .domain(d3.extent(data,xValue))
-		    .range([0,width]);
-
-		var y = d3.scale.linear()                // interpolator for Y axis -- inner plot region
-		    .domain(d3.extent(data,yValue))
-		    .range([height,0]);                  // remember, (0,0) is upper left -- this reverses "y"
-
-		var line = d3.svg.line()                 // SVG line generator
-		    .x(function(d) { return x(d.x); } )
-		    .y(function(d) { return y(d.y); } );
-
-		var xAxis = d3.svg.axis()                // x Axis
-		    .scale(x)
-		    .ticks(5)                            // request 5 ticks on the x axis
-		    .orient("bottom");
-
-		var yAxis = d3.svg.axis()                // y Axis
-		    .scale(y)
-		    .ticks(4)
-		    .orient("left");
-
-		var svg = d3.select("body").append("svg")
-		    .attr("width",  outerWidth)
-		    .attr("height", outerHeight);        // Note: ok to leave this without units, implied "px"
-
-		var g = svg.append("g")                  // <g> element is the inner plot area (i.e., inside the margins)
-		    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-		g.append("g")                            // render the Y axis in the inner plot area
-		    .attr("class", "y axis")
-		    .call(yAxis);
-
-		g.append("g")                            // render the X axis in the inner plot area
-		    .attr("class", "x axis")
-		    .attr("transform", "translate(0," + height + ")")  // axis runs along lower part of graph
-		    .call(xAxis);
-
-		g.append("text")                         // outer x-axis label
-		    .attr("class", "x label") 
-		    .attr("text-anchor", "end") 
-		    .attr("x", width/2) 
-		    .attr("y", height + 2*margin.bottom/3 + 6) 
-		    .text("outer x-axis label");
-
-		g.append("text")                         // plot title
-		    .attr("class", "x label") 
-		    .attr("text-anchor", "middle") 
-		    .attr("x", width/2)
-		    .attr("y", -margin.top/2)
-		    .attr("dy", "+.75em") 
-		    .text("plot title");
-
-		g.append("text")                         // outer y-axis label
-		    .attr("class", "x label") 
-		    .attr("text-anchor", "middle") 
-		    .attr("x", -height/2)
-		    .attr("y", -6 - margin.left/3)
-		    .attr("dy", "-.75em") 
-		    .attr("transform", "rotate(-90)") 
-		    .text("outer y-axis label");
-
-		g.append("path")                         // plot the data as a line
-		    .datum(data)
-		    .attr("class", "line")
-		    .attr("d", line);
-
-		g.append("rect")                         // plot a rectangle that encloses the inner plot area
-		    .attr("width", width)
-		    .attr("width", width)
-		    .attr("height", height);
-
-		g.selectAll(".dot")                      // plot a circle at each data location
-		    .data(data)
-		  .enter().append("circle")
-		    .attr("class", "dot")
-		    .attr("cx", function(d) { return x(d.x); } )
-		    .attr("cy", function(d) { return y(d.y); } )
-		    .attr("r", 5);
-
-		d3.selectAll("path").transition()       // data transition
-		    .style("stroke", "steelblue")
-		    .delay(1000)
-		    .duration(2000);
-
-	</script>
+			xyDiagramm(data);
+			</script>
 		</div>
 	</div>
 
