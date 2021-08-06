@@ -1,25 +1,25 @@
 package com.fdmgroup.traderinfo.model;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity
-public class CurrencyPair {
-	
-	@Id
-	@GeneratedValue
-	private Integer epochTime;
-	private Integer openPrice;
-	private Integer closePrice;
-	private String pairName;
-	
-	public CurrencyPair() {}
+public class CurrencyPairEntry {
 
-	public CurrencyPair(Integer epochTime, Integer openPrice, Integer closePrice, String name) {
+	@Id
+	private Integer epochTime;
+	private String pairName;
+	private BigDecimal openPrice, highestPrice, lowestPrice, closePrice;
+	
+	public CurrencyPairEntry() {}
+	
+	public CurrencyPairEntry(Integer epochTime, BigDecimal openPrice, BigDecimal highestPrice, BigDecimal lowestPrice, BigDecimal closePrice, String name) {
 		this.epochTime = epochTime;
+		this.highestPrice = highestPrice;
+		this.lowestPrice = lowestPrice;
 		this.openPrice = openPrice;
 		this.closePrice = closePrice;
 		this.pairName = name;
@@ -33,19 +33,19 @@ public class CurrencyPair {
 		this.epochTime = epochTime;
 	}
 
-	public Integer getOpenPrice() {
+	public BigDecimal getOpenPrice() {
 		return openPrice;
 	}
 
-	public void setOpenPrice(Integer openPrice) {
+	public void setOpenPrice(BigDecimal openPrice) {
 		this.openPrice = openPrice;
 	}
 
-	public Integer getClosePrice() {
+	public BigDecimal getClosePrice() {
 		return closePrice;
 	}
 
-	public void setClosePrice(Integer closePrice) {
+	public void setClosePrice(BigDecimal closePrice) {
 		this.closePrice = closePrice;
 	}
 
@@ -70,7 +70,7 @@ public class CurrencyPair {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		CurrencyPair other = (CurrencyPair) obj;
+		CurrencyPairEntry other = (CurrencyPairEntry) obj;
 		return Objects.equals(closePrice, other.closePrice) && Objects.equals(epochTime, other.epochTime)
 				&& Objects.equals(pairName, other.pairName) && Objects.equals(openPrice, other.openPrice);
 	}
@@ -80,7 +80,22 @@ public class CurrencyPair {
 		return "CurrencyPair [epochTime=" + epochTime + ", openPrice=" + openPrice + ", closePrice=" + closePrice
 				+ ", name=" + pairName + "]";
 	}
-	
-	
+
+	public BigDecimal getHighestPrice() {
+		return highestPrice;
+	}
+
+	public void setHighestPrice(BigDecimal highestPrice) {
+		this.highestPrice = highestPrice;
+	}
+
+	public BigDecimal getLowestPrice() {
+		return lowestPrice;
+	}
+
+	public void setLowestPrice(BigDecimal lowestPrice) {
+		this.lowestPrice = lowestPrice;
+	}	
 	
 }
+

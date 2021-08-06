@@ -6,7 +6,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-<title>welcome to trading informations</title>
+<title>No Exchange connection</title>
 <style>
 .container {
 	text-align: center}
@@ -15,17 +15,9 @@
 <body bgcolor="#000000" text="#ffffff">
 	<div class="container">
 		<br></br>
-		<h1>Welcome</h1>
+		<h3>There is no connection to the exchange in the moment.</h3>
 		<br></br>
-		<h2>Here you get information for your trading</h2>
-		<br></br>
-		<p>Available currency pairs:</p>
-		<c:forEach items="${pairNames}" var="pairName">
-				<form action="/${pairName}" method="post">
-					<input type="hidden" value="${pairName}" name="pairName"/><br/>
-					<input type="submit" value="${pairName}"/>
-				</form>
-		</c:forEach>
+		<p>Please try to reach the page later again.</p>
 	</div>
 	
 </body>
