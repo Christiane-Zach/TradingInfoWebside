@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fdmgroup.traderinfo.controller.TraderInfoController;
-import com.fdmgroup.traderinfo.service.CandleCollectionService;
-import com.fdmgroup.traderinfo.service.CurrencyPairService;
+import com.fdmgroup.traderinfo.service.ExchangeService;
+import com.fdmgroup.traderinfo.service.DatabaseService;
 
 @SpringBootTest(classes = {TraderInfoController.class})
 @ExtendWith(SpringExtension.class)
@@ -30,9 +30,9 @@ import com.fdmgroup.traderinfo.service.CurrencyPairService;
 public class TraderInfoControllerTest {
 	
 	@MockBean
-	private CandleCollectionService config;
+	private ExchangeService config;
 	@MockBean
-	private CurrencyPairService service;
+	private DatabaseService service;
 	
 	@Autowired
 	private MockMvc mockMvc;

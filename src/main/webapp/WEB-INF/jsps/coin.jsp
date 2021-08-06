@@ -43,6 +43,25 @@
 					<input type="submit" value="${pairName}"/>
 				</form>
 			</c:forEach>
+			<br></br>
+			<form action="/${pairName}/${interval}/zoomedtime" method="post">
+				<input type="hidden" value="${oldPairName}" name="pairName"/><br/>
+				<input type="hidden" value="${oldInterval}" name="interval"/><br/>
+				<p>Enter start time:</p>
+				<input type="text" placeholder="Hour" name="startHour"/>
+				<input type="text" placeholder="Minute" name="startMinute"/>
+				<input type="text" placeholder="Day" name="startDay"/>
+				<input type="text" placeholder="Month" name="startMonth"/>
+				<input type="text" placeholder="Year" name="startYear"/>
+				<p>Enter end time:</p>
+				<input type="text" placeholder="Hour" name="endHour"/>
+				<input type="text" placeholder="Minute" name="endMinute"/>
+				<input type="text" placeholder="Day" name="endDay"/>
+				<input type="text" placeholder="Month" name="endMonth"/>
+				<input type="text" placeholder="Year" name="endYear"/>
+				<br></br>
+				<input type="submit" value="set time"/>
+			</form>
 		</div>
 		<div class="float-right" style="display: flex;">
 			<c:forEach items="${intervals}" var="interval">
@@ -143,9 +162,9 @@
 			}
 			
 			var data = [
-				<c:forEach items="${candles}" var="candle" varStatus="status">  
-				    {x: '${candle.epochTime}',
-				    y: '${candle.openPrice}'}
+				<c:forEach items="${binancePrices}" var="binancePrice" varStatus="status">  
+				    {x: new Date('${binancePrice.epochTime}'),
+				    y: '${binancePrice.price}'}
 				    <c:if test="${!status.last}">,    
 				    </c:if>  
 				    </c:forEach>  
@@ -173,9 +192,9 @@
 		<div class="float-right">
 			<script>
 			var data = [
-				<c:forEach items="${candles}" var="candle" varStatus="status">  
-				    {x: '${candle.epochTime}',
-				    y: '${candle.openPrice}'}
+				<c:forEach items="${bitfinexPrices}" var="bitfinexPrice" varStatus="status">  
+				    {x: new Date('${bitfinexPrice.epochTime}'),
+				    y: '${bitfinexPrice.price}'}
 				    <c:if test="${!status.last}">,    
 				    </c:if>  
 				    </c:forEach>  
@@ -203,9 +222,9 @@
 		<div class="float-right">
 			<script>
 			var data = [
-				<c:forEach items="${candles}" var="candle" varStatus="status">  
-				    {x: '${candle.epochTime}',
-				    y: '${candle.openPrice}'}
+				<c:forEach items="${bbDifferences}" var="bbDifference" varStatus="status">  
+				    {x: new Date('${bbDifference.key}'),
+				    y: '${bbDifference.value}'}
 				    <c:if test="${!status.last}">,    
 				    </c:if>  
 				    </c:forEach>  

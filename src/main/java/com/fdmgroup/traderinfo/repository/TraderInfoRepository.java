@@ -6,11 +6,22 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.fdmgroup.traderinfo.model.CurrencyPairEntry;
+import com.fdmgroup.traderinfo.model.CoinPair;
+import com.fdmgroup.traderinfo.model.Exchange;
+import com.fdmgroup.traderinfo.model.PriceEntry;
 
 @Repository
-public interface TraderInfoRepository extends JpaRepository<CurrencyPairEntry, Integer>{
+public interface TraderInfoRepository extends JpaRepository<PriceEntry, Integer>{
 
-	@Query("SELECT p FROM CurrencyPairEntry p where p.pairName LIKE %?1%")
-	List<CurrencyPairEntry> filterByPairName(String pairName);
+	@Query("SELECT p FROM PriceEntry p where p.pairId LIKE ?1 and p.exchangeId LIKE ?2")
+	List<PriceEntry> filterByPairId(Integer pairId, Integer exchangeId);
+	
+	@Query("SELECT e FROM Exchange e where e.exchangeName LIKE %?1%")
+	List<Exchange> getExchangeByExchangeName(String exchangeName);
+	
+	@Query("SELECT c FROM CoinPair c where c.coinPairName LIKE %?1%")
+	List<CoinPair> getPairByName(String pairName);
+	
+	@Query("SELECT d FROM CoinPair d")
+	List<CoinPair> getPair();
 }

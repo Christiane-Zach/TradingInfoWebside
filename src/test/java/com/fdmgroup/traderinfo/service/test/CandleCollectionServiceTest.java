@@ -14,10 +14,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.fdmgroup.traderinfo.exception.NoConnectionToTheExchangeException;
-import com.fdmgroup.traderinfo.model.CurrencyPairEntry;
+import com.fdmgroup.traderinfo.model.PriceEntry;
 import com.fdmgroup.traderinfo.repository.TraderInfoRepository;
-import com.fdmgroup.traderinfo.service.CandleCollectionService;
-import com.fdmgroup.traderinfo.service.CurrencyPairService;
+import com.fdmgroup.traderinfo.service.ExchangeService;
+import com.fdmgroup.traderinfo.service.DatabaseService;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
@@ -26,12 +26,12 @@ public class CandleCollectionServiceTest {
 	@MockBean
 	TraderInfoRepository mockRepo;
 	@MockBean
-	CurrencyPairEntry mockCurrencyPairEntry;
+	PriceEntry mockCurrencyPairEntry;
 	
 	@InjectMocks
-	CandleCollectionService config;
+	ExchangeService config;
 	@MockBean
-	CurrencyPairService service;
+	DatabaseService service;
 	
 	//@Test
 	//public void testExtractCandels_create500PairEntrys() {

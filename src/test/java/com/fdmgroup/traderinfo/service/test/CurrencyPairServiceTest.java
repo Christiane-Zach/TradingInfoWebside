@@ -17,11 +17,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.fdmgroup.traderinfo.model.CurrencyPairEntry;
-import com.fdmgroup.traderinfo.model.CurrencyPairIntervalEntry;
+import com.fdmgroup.traderinfo.model.PriceEntry;
 import com.fdmgroup.traderinfo.repository.TraderInfoRepository;
-import com.fdmgroup.traderinfo.service.CandleCollectionService;
-import com.fdmgroup.traderinfo.service.CurrencyPairService;
+import com.fdmgroup.traderinfo.service.ExchangeService;
+import com.fdmgroup.traderinfo.service.DatabaseService;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
@@ -30,16 +29,16 @@ public class CurrencyPairServiceTest {
 	@MockBean
 	TraderInfoRepository mockRepo;
 	@MockBean
-	CurrencyPairEntry mockCurrencyPairEntry;
+	PriceEntry mockCurrencyPairEntry;
 	
 	@InjectMocks
-	CurrencyPairService service;
+	DatabaseService service;
 	@MockBean
-	CandleCollectionService config;
+	ExchangeService config;
 	
 	@Test
 	public void testCurrencyPairService_filterByPairName() {
-		List<CurrencyPairEntry> expectedList = new ArrayList<>();
+		List<PriceEntry> expectedList = new ArrayList<>();
 		Mockito.when(mockRepo.filterByPairName("BTCUSDT")).thenReturn(expectedList);
 		service.filterByPairName("BTCUSDT");
 		verify(mockRepo).filterByPairName("BTCUSDT");
@@ -53,17 +52,17 @@ public class CurrencyPairServiceTest {
 	
 	@Test
 	public void testCurrencyPairService_findIntervalEntriesForPairs_returnListOfCurrencyIntervalEntriesWithReducedEntrysToListOfCurrencyPairEntry() {
-		List<CurrencyPairEntry> expectedList = new ArrayList<>();
+		List<PriceEntry> expectedList = new ArrayList<>();
 		for (int i=1; i<23;i++) {
 			BigDecimal bD = new BigDecimal(i);
-			CurrencyPairEntry currencyPairEntry = new CurrencyPairEntry(i,bD,bD,bD,bD,"BTCUSDT");
+			PriceEntry currencyPairEntry = new PriceEntry(i,null, i, bD,i);
 			expectedList.add(currencyPairEntry);
 		}
 		Map<String,Integer> map = new LinkedHashMap<String, Integer>();
 		map.put("5minutes", 5);
 		Mockito.when(config.intervals()).thenReturn(map);
 		Mockito.when(service.filterByPairName("BTCUSDT")).thenReturn(expectedList);
-		List<CurrencyPairIntervalEntry> readoutList = service.findIntervalEntriesForPair("5minutes", "BTCUSDT");
+		List<PriceEntry> readoutList = service.findIntervalEntriesForPair("5minutes", "BTCUSDT");
 		assertEquals(22, expectedList.size());
 		assertEquals(4, readoutList.size());
 	}
