@@ -3,7 +3,7 @@ package com.fdmgroup.traderinfo.service;
 import java.io.BufferedReader;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -29,17 +29,14 @@ public abstract class ExchangeService{
 		intervals.put("6hours", 360);
 		intervals.put("8hours", 480);
 		intervals.put("12hours", 720);
-		intervals.put("1day", 1440);
-		intervals.put("3days", 4320);
-		intervals.put("1week", 10080);
 		return intervals;
 	}
 	
 	public LocalDateTime convertEpochTimeToDate(Long epochTime){
-        return LocalDateTime.ofEpochSecond(epochTime/1000, (int)(epochTime%1000), ZoneOffset.UTC);
+        return LocalDateTime.ofEpochSecond(epochTime/1000, (int)(epochTime%1000), OffsetDateTime.now().getOffset());
     }
 	
-	protected long convertDateToEpochTime(LocalDateTime localDateTime){
+	public long convertDateToEpochTime(LocalDateTime localDateTime){
 		return localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 	}
 }

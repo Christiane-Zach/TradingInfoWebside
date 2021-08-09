@@ -1,5 +1,6 @@
 package com.fdmgroup.traderinfo.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,7 +14,7 @@ import com.fdmgroup.traderinfo.model.PriceEntry;
 @Repository
 public interface TraderInfoRepository extends JpaRepository<PriceEntry, Integer>{
 
-	@Query("SELECT p FROM PriceEntry p where p.pairId LIKE ?1 and p.exchangeId LIKE ?2")
+	@Query("SELECT p FROM PriceEntry p where p.pairId LIKE ?1 and p.exchangeId LIKE ?2 ORDER BY p.time")
 	List<PriceEntry> filterByPairId(Integer pairId, Integer exchangeId);
 	
 	@Query("SELECT e FROM Exchange e where e.exchangeName LIKE %?1%")
@@ -24,4 +25,7 @@ public interface TraderInfoRepository extends JpaRepository<PriceEntry, Integer>
 	
 	@Query("SELECT d FROM CoinPair d")
 	List<CoinPair> getPair();
+	
+	@Query("SELECT MAX(p.time) FROM PriceEntry p where p.pairId LIKE ?1 and p.exchangeId LIKE ?2")
+	LocalDateTime getMaxEpochTime(Integer pairId, Integer exchangeId);
 }

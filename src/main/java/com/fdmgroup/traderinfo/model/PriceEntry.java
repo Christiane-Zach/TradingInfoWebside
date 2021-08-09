@@ -11,9 +11,10 @@ import javax.persistence.Id;
 public class PriceEntry {
 	
 	@Id
+	
 	private Integer priceId;
 	
-	private LocalDateTime epochTime;
+	private LocalDateTime time;
 	private Integer pairId;
 	private BigDecimal price;
 	private Integer exchangeId;
@@ -21,10 +22,10 @@ public class PriceEntry {
 	public PriceEntry() {};
 	
 	
-	public PriceEntry(Integer priceId, LocalDateTime epochTime, Integer pairId, BigDecimal price, Integer exchangeId) {
+	public PriceEntry(Integer priceId, LocalDateTime time, Integer pairId, BigDecimal price, Integer exchangeId) {
 		super();
 		this.priceId = priceId;
-		this.epochTime = epochTime;
+		this.time = time;
 		this.pairId = pairId;
 		this.price = price;
 		this.exchangeId = exchangeId;
@@ -40,11 +41,11 @@ public class PriceEntry {
 	}
 
 
-	public LocalDateTime getEpochTime() {
-		return epochTime;
+	public LocalDateTime getTime() {
+		return time;
 	}
-	public void setEpochTime(LocalDateTime epochTime) {
-		this.epochTime = epochTime;
+	public void setTime(LocalDateTime time) {
+		this.time = time;
 	}
 	public Integer getPairId() {
 		return pairId;
@@ -67,7 +68,7 @@ public class PriceEntry {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(price, epochTime, exchangeId, pairId);
+		return Objects.hash(price, time, exchangeId, pairId);
 	}
 
 	@Override
@@ -79,13 +80,13 @@ public class PriceEntry {
 		if (getClass() != obj.getClass())
 			return false;
 		PriceEntry other = (PriceEntry) obj;
-		return Objects.equals(price, other.price) && Objects.equals(epochTime, other.epochTime)
+		return Objects.equals(price, other.price) && Objects.equals(time, other.time)
 				&& Objects.equals(exchangeId, other.exchangeId) && Objects.equals(pairId, other.pairId);
 	}
 
 	@Override
 	public String toString() {
-		return "Price [priceId=" + priceId + ", epochTime=" + epochTime + ", pairId=" + pairId + ", Price=" + price
+		return "Price [priceId=" + priceId + ", time=" + time + ", pairId=" + pairId + ", Price=" + price
 				+ ", exchangeId=" + exchangeId + "]";
 	}
 	

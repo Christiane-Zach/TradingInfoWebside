@@ -3,7 +3,6 @@ package com.fdmgroup.traderinfo.service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,14 +23,15 @@ public class DatabaseService{
 	private ExchangeService exService;
 	
 	public List<PriceEntry> filterByPairName(String pairName, String exchangeName) {
-		Integer pairId = getPairId(pairName);
-		Integer exchangeId = getExchangeId(exchangeName);
-		System.out.println(exchangeId);
-		return repo.filterByPairId(pairId, exchangeId);
+		return repo.filterByPairId(getPairId(pairName), getExchangeId(exchangeName));
 	}
 
 	public void createPriceEntry(PriceEntry price) {
 		repo.save(price);
+	}
+	
+	public LocalDateTime getMaxEpochTime(String pairName, String exchangeName) {
+		return repo.getMaxEpochTime(getPairId(pairName), getExchangeId(exchangeName));
 	}
 	
 	public Integer getExchangeId(String exchangeName) {
@@ -53,56 +53,48 @@ public class DatabaseService{
 		return coinPair.getCoinPairId();
 	}
 
-	public List<PriceEntry> findIntervalEntriesForPair(String interval, String pairName, String exchangeName) {
-		List<PriceEntry> allEntries = filterByPairName(pairName, exchangeName);
+	public List<PriceEntry> findIntervalForPriceEntries(String interval, List<PriceEntry> priceEntries) {
 		Map<String, Integer> mappedIntervals = exService.intervals();
 		List<PriceEntry> intervalEntries = new ArrayList<>();
 		int count = mappedIntervals.get(interval);
-		for (int i=0; i<allEntries.size()-count-1; i+=count) {
-			PriceEntry firstEntry = allEntries.get(i);
-			PriceEntry currencyPairInterval = new PriceEntry(firstEntry.getPairId(), firstEntry.getEpochTime(), i, firstEntry.getPrice(),firstEntry.getPairId());
+		for (int i=0; i<priceEntries.size()-count; i+=count) {
+			PriceEntry firstEntry = priceEntries.get(i);
+			PriceEntry currencyPairInterval = new PriceEntry(
+					firstEntry.getPairId(), firstEntry.getTime(), i, firstEntry.getPrice(),firstEntry.getPairId());
 			intervalEntries.add(currencyPairInterval);
 		}
 		return intervalEntries;
 	}
 	
-	public Map<LocalDateTime, BigDecimal> differenceBetweenBinanceAndBitfinex(String interval, String pairName) {
-		List<PriceEntry> binancePriceEntries = findIntervalEntriesForPair(interval, pairName, "Binance");
-		List<PriceEntry> bitfinexPriceEntries = findIntervalEntriesForPair(interval, pairName, "Bitfinex");
-		Map<LocalDateTime, BigDecimal> differencMap = new LinkedHashMap<>();
-		for (PriceEntry binancePriceEntry: binancePriceEntries) {
-			for (PriceEntry bitfinexPriceEntry: bitfinexPriceEntries) {
-				if ((binancePriceEntry.getEpochTime()).isEqual(bitfinexPriceEntry.getEpochTime())) {
-					BigDecimal difference = ((binancePriceEntry.getPrice()).subtract(bitfinexPriceEntry.getPrice())).abs();
-					differencMap.put(binancePriceEntry.getEpochTime(), difference);
+	public List<PriceEntry> exchangePriceDifference(List<PriceEntry> priceEntriesFirstEx, 
+													List<PriceEntry> priceEntriesSecondEx) {
+		List<PriceEntry> differenceList = new ArrayList<>();
+		for (PriceEntry priceEntryFirstEx: priceEntriesFirstEx) {
+			for (PriceEntry priceEntrySecondEx: priceEntriesSecondEx) {
+				if ((priceEntryFirstEx.getTime()).isEqual(priceEntrySecondEx.getTime())) {
+					BigDecimal difference = (
+							(priceEntryFirstEx.getPrice()).subtract(priceEntrySecondEx.getPrice())).abs();
+					Integer priceId = priceEntryFirstEx.getPriceId() * priceEntrySecondEx.getPriceId();
+					Integer exchangeId = Integer.parseInt(Integer.toString(priceEntryFirstEx.getExchangeId()) 
+							+ Integer.toString(priceEntrySecondEx.getExchangeId()));
+					PriceEntry price = new PriceEntry(priceId, priceEntryFirstEx.getTime(), 
+							priceEntryFirstEx.getPairId(), difference, exchangeId);
+					differenceList.add(price);
 				}
 			}
 		}
-		return differencMap;
+		return differenceList;
 	}
 
-	public List<PriceEntry> findIntervalEntriesForPairInTimeInterval(String interval, String pairName, String exchangeName, LocalDateTime startDate, LocalDateTime endDate) {
-		List<PriceEntry> priceEntries = findIntervalEntriesForPair(interval, pairName, exchangeName);
+	public List<PriceEntry> findPriceEntriesInTimeInterval(List<PriceEntry> priceEntries, 
+															LocalDateTime startDate, LocalDateTime endDate) {
 		List<PriceEntry> zoomedPriceEntries = new ArrayList<>();
 		for (PriceEntry priceEntry: priceEntries) {
-			if ((priceEntry.getEpochTime()).isAfter(startDate) && (priceEntry.getEpochTime()).isBefore(endDate)) {
+			if ((priceEntry.getTime()).isAfter(startDate) && (priceEntry.getTime()).isBefore(endDate)) {
 				zoomedPriceEntries.add(priceEntry);
 			}
 		}
 		return zoomedPriceEntries;
-	}
-
-	public Map<LocalDateTime, BigDecimal> differenceBetweenBinanceAndBitfinexInTimeInterval(String interval, String pairName,
-			LocalDateTime startDate, LocalDateTime endDate) {
-			Map<LocalDateTime, BigDecimal> differenceMap = differenceBetweenBinanceAndBitfinex(interval, pairName);
-			Map<LocalDateTime, BigDecimal> zoomedDifferenceMap = new LinkedHashMap<>();
-			long i = 0;
-			for (Map.Entry<LocalDateTime, BigDecimal> differencePerDate : differenceMap.entrySet()) {
-				if((differencePerDate.getKey()).isAfter(startDate) && (differencePerDate.getKey()).isBefore(endDate)) {
-					zoomedDifferenceMap.put(differencePerDate.getKey(), differencePerDate.getValue());
-				}
-			}
-			return zoomedDifferenceMap;
 	}
 
 }

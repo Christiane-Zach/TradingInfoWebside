@@ -34,7 +34,7 @@ public class BinanceService extends ExchangeService{
 		       throw new NoConnectionToTheExchangeException();}
 	}
 
-	@Override
+	@Override 
 	public void extractPrice(BufferedReader inStream, Integer pairId) {
 		try {
 			String outputLine;
@@ -43,10 +43,18 @@ public class BinanceService extends ExchangeService{
 	        	for(int i=1; i<partsOfOutputLine.length; i++) { 
 	        		Integer exchangeId = dbService.getExchangeId("Binance");
 	        		String[] smallerPartsOfOutputLine = partsOfOutputLine[i].split(",");
-	        		Long epochTime = Long.parseLong(smallerPartsOfOutputLine[1].substring(1));
-	        		Integer priceId = Integer.parseInt(Integer.toString(exchangeId) + Integer.toString(pairId) + smallerPartsOfOutputLine[1].substring(5, smallerPartsOfOutputLine[2].length()-6));
-	        		LocalDateTime currentTime = convertEpochTimeToDate(epochTime);
-	                BigDecimal currentPrice = new BigDecimal(smallerPartsOfOutputLine[2].substring(1, smallerPartsOfOutputLine[2].length()-1));
+	        		Integer priceId;
+	        		if (pairId == 1) {
+	        			priceId = Integer.parseInt(Integer.toString(exchangeId) + Integer.toString(pairId) 
+        				+ smallerPartsOfOutputLine[1].substring(5, smallerPartsOfOutputLine[2].length()-6));
+	        		} else {
+	        			priceId = Integer.parseInt(Integer.toString(exchangeId) + Integer.toString(pairId) 
+	        				+ smallerPartsOfOutputLine[1].substring(5, smallerPartsOfOutputLine[2].length()-3));
+	        		}
+	        		LocalDateTime currentTime = convertEpochTimeToDate(Long.parseLong(
+	        				smallerPartsOfOutputLine[1].substring(1)));
+	                BigDecimal currentPrice = new BigDecimal(smallerPartsOfOutputLine[2].substring(1, 
+	                		smallerPartsOfOutputLine[2].length()-1));
 	                PriceEntry price = new PriceEntry(priceId, currentTime, pairId, currentPrice, exchangeId);
 	                dbService.createPriceEntry(price);
 	        	}

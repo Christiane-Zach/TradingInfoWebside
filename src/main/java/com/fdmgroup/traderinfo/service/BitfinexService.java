@@ -22,11 +22,16 @@ public class BitfinexService extends ExchangeService{
 	@Override
 	public void connectionToExchange(String pairName, LocalDateTime startTime, LocalDateTime endTime) {
 		try {
-			URL url = new URL("https://api-pub.bitfinex.com/v2/candles/trade:1m:t" + pairName.substring(0,pairName.length() - 1) 
-							+ "/hist?limit=500&start=" + convertDateToEpochTime(startTime) + "&end="
+			Integer pairId = dbService.getPairId(pairName);
+			if (pairName.equals("BTCUSDT")) {
+				pairName = pairName.substring(0,pairName.length() - 1);
+			}
+			URL url = new URL("https://api-pub.bitfinex.com/v2/candles/trade:1m:t" 
+							+ pairName + "/hist?limit=500&start=" 
+							+ convertDateToEpochTime(startTime) + "&end="
 							+ convertDateToEpochTime(endTime) + "&sort=-1");
 			BufferedReader inStream = new BufferedReader(new InputStreamReader(url.openStream()));
-			extractPrice(inStream, dbService.getPairId(pairName));
+			extractPrice(inStream, pairId);
 		} catch (IOException e) {
 		       throw new NoConnectionToTheExchangeException();}
 	}
@@ -42,7 +47,8 @@ public class BitfinexService extends ExchangeService{
 	        		String cuttedPart = partsOfOutputLine[i].substring(1);
 	        		String[] smallerPartsOfOutputLine = cuttedPart.split(",");
 	        		Long epochTime = Long.parseLong(smallerPartsOfOutputLine[0].substring(1));
-	        		Integer priceId = Integer.parseInt(Integer.toString(exchangeId) + Integer.toString(pairId) + smallerPartsOfOutputLine[0].substring(6, smallerPartsOfOutputLine[0].length()-4));
+	        		Integer priceId = Integer.parseInt(Integer.toString(exchangeId) + Integer.toString(pairId) 
+	        				+ smallerPartsOfOutputLine[0].substring(6, smallerPartsOfOutputLine[0].length()-4));
 	        		LocalDateTime currentTime = convertEpochTimeToDate(epochTime);
 	                BigDecimal currentPrice = new BigDecimal(smallerPartsOfOutputLine[1]);
 	                PriceEntry priceEntry = new PriceEntry(priceId, currentTime, pairId, currentPrice, exchangeId);
