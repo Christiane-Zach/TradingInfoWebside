@@ -14,6 +14,13 @@
 </head>
 <body bgcolor="#000000" text="#ffffff">
 	<div class="container">
+	
+		<form action="/search" method="post">
+			<input type="text" placeholder="Search for an item..." name="searchedFor" class="searchbar"/>
+			<button type="submit">Search</button>
+		</form>
+		
+		
 		<br></br>
 		<h1>Welcome</h1>
 		<br></br>

@@ -16,8 +16,10 @@ import com.fdmgroup.traderinfo.service.BinanceService;
 import com.fdmgroup.traderinfo.service.BitfinexService;
 import com.fdmgroup.traderinfo.service.DatabaseService;
 
+import java.sql.Date;
 import java.time.LocalDateTime;
 import java.time.temporal.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -35,6 +37,23 @@ public class TraderInfoController {
 	public String goToIndexPage(ModelMap model) {
 		model.addAttribute("pairNames", dbService.getPairNames());
 		return "index";
+	}
+	
+	@GetMapping("/booking")
+	public String goToBooking(ModelMap model) {
+		List<Date> dates = new ArrayList<>();
+		java.util.Date myDate = new java.util.Date("18/08/2020");
+		Date sqlDate = new Date(myDate.getTime());
+		dates.add(sqlDate);
+		model.addAttribute("dates", dates);
+		return "booking";
+	}
+	
+	@PostMapping("/search")
+	public String searchForAnItem(ModelMap model, @RequestParam String searchedFor) {
+		model.addAttribute("category", searchedFor);
+		//model.addAttribute("Items",model.getAttribute("category").getItems());
+		return "categories";
 	}
 	
 	@PostMapping("/{pairName}")
